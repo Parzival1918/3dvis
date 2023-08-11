@@ -1,4 +1,5 @@
 from ursina import *
+from ursina.prefabs.dropdown_menu import DropdownMenu, DropdownMenuButton
 
 import parse_files
 
@@ -16,6 +17,8 @@ atoms = parse_files.parse_XYZ("testFiles/pyridine.xyz")
 
 # Class entities
 class Atom(Entity):
+    atomSelected = False
+
     def __init__(self, position=(0,0,0), scale=(1,1,1), **kwargs):
         super().__init__()
         self.model = 'sphere'
@@ -40,11 +43,25 @@ for atom in atoms:
     spheres.append(sphere)
 
 # b = Button(text='hello world!', color=color.azure, scale=.25, highlight_scale=1.1)
-# b.on_click = application.quit # assign a function to the button.
-# b.tooltip = Tooltip('exit')
+# b.tooltip = Tooltip('test')
 
 # UI text and buttons
 rotText = Text(text='Rotation: OFF', position=window.top_left)
+
+# DropdownMenu('File', buttons=(
+#     DropdownMenuButton('New'),
+#     DropdownMenuButton('Open'),
+#     DropdownMenu('Reopen Project', buttons=(
+#         DropdownMenuButton('Project 1'),
+#         DropdownMenuButton('Project 2'),
+#         )),
+#     DropdownMenuButton('Save'),
+#     DropdownMenu('Options', buttons=(
+#         DropdownMenuButton('Option a'),
+#         DropdownMenuButton('Option b'),
+#         )),
+#     DropdownMenuButton('Exit'),
+#     ))
 
 rotToggled = False
 def input(key):
