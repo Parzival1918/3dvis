@@ -4,9 +4,7 @@ from ursina.prefabs.dropdown_menu import DropdownMenu, DropdownMenuButton
 import parse_files
 
 # create a window
-app = Ursina(title="3Dvis")
-
-window.borderless = False # show a border
+app = Ursina(title="3Dvis", borderless=False, editor_ui_enabled=False, development_mode=False, fullscreen=False)
 
 # Set initial variables
 # initialCameraPosition = camera.position
