@@ -17,19 +17,11 @@ initialCameraPosition = (0, 0, -20)
 
 #Read data from file
 atoms, uniqueSpecies = parse_files.parse_XYZ("testFiles/pyridine.xyz")
-selectionColours = [color.random_color() for _ in range(len(uniqueSpecies))]
-print(selectionColours)
+selectionColours = []
 
 # UI text and buttons
 rotText = Text(text='Rotation: OFF', position=window.bottom_right, origin=(+0.5, -0.5))
 selectionTxt = Text(text='No atom selected', position=window.bottom_left, origin=(-0.5, -0.5))
-
-DropdownMenu('Settings', buttons=(
-    DropdownMenu('Atomic size', buttons=(
-        DropdownMenuButton('From file', on_click=lambda: print('From file')),
-        DropdownMenuButton('From table', on_click=lambda: print('From table')),
-    )),
-))
 
 # Class entities
 class Atom(Entity):
@@ -50,13 +42,13 @@ class Atom(Entity):
             self.color = color.tint(self.color, .1)
             selectionTxt.text = f"{self.name}: {self.atomPosition}"
         else:
+            global selectionColours
             self.color = selectionColours[uniqueSpecies.index(self.name)]
 
 # create app contents
 spheres = []
 for atom in atoms:
-    scale = atomicData.loc[atomicData["Symbol"] == atom['element']]["AtomicRadius"] / 100.0
-    sphere = Atom(position=(atom['x'], atom['y'], atom['z']), color=selectionColours[uniqueSpecies.index(atom['element'])], scale=(scale, scale, scale))
+    sphere = Atom(position=(atom['x'], atom['y'], atom['z']))
     sphere.name = atom['element']
     sphere.atomPosition = (atom['x'], atom['y'], atom['z'])
 
@@ -99,6 +91,41 @@ def update():
 
     if mouse.hovered_entity == None:
         selectionTxt.text = 'No atom selected'
+
+def atomic_size_from_table():
+    print("Atomic size from table")
+
+    for sphere in spheres:
+        scale = atomicData.loc[atomicData["Symbol"] == sphere.name]["AtomicRadius"] / 100.0
+        sphere.scale = (scale, scale, scale)
+
+def atomic_size_equal():
+    print("Atomic size constant")
+
+    for sphere in spheres:
+        sphere.scale = (1, 1, 1)
+
+def colour_random():
+    print("Colour random")
+
+    global selectionColours
+    selectionColours = [color.random_color() for _ in range(len(uniqueSpecies))]
+    for sphere in spheres:
+        sphere.color = color.random_color()
+
+DropdownMenu('Settings', buttons=(
+    DropdownMenu('Atomic size', buttons=(
+        DropdownMenuButton('From file', on_click=lambda: print('From file')),
+        DropdownMenuButton('From table', on_click=lambda: atomic_size_from_table(), tooltip=Tooltip('Set atomic size from table')),
+        DropdownMenuButton('Equal', on_click=lambda: atomic_size_equal()),
+    )),
+    DropdownMenu('Colour', buttons=(
+        DropdownMenuButton('Random', on_click=lambda: colour_random()),
+    ))
+))
+
+atomic_size_from_table() # Set atomic size from table as default
+colour_random() # Set random colours as default
 
 # start running the app
 app.run()
