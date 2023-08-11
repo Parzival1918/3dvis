@@ -1,7 +1,12 @@
 from ursina import *
 from ursina.prefabs.dropdown_menu import DropdownMenu, DropdownMenuButton
+import pandas as pd
 
 import parse_files
+
+#Load the atomic data from the csv file PubChemElements_all.csv
+atomicData = pd.read_csv("dataFiles/PubChemElements_all.csv")
+# print(atomicData.loc[atomicData["Symbol"] == "H"]["AtomicRadius"])
 
 # create a window
 app = Ursina(title="3Dvis", borderless=False, editor_ui_enabled=False, development_mode=False, fullscreen=False)
@@ -50,7 +55,8 @@ class Atom(Entity):
 # create app contents
 spheres = []
 for atom in atoms:
-    sphere = Atom(position=(atom['x'], atom['y'], atom['z']), color=selectionColours[uniqueSpecies.index(atom['element'])])
+    scale = atomicData.loc[atomicData["Symbol"] == atom['element']]["AtomicRadius"] / 100.0
+    sphere = Atom(position=(atom['x'], atom['y'], atom['z']), color=selectionColours[uniqueSpecies.index(atom['element'])], scale=(scale, scale, scale))
     sphere.name = atom['element']
     sphere.atomPosition = (atom['x'], atom['y'], atom['z'])
 
