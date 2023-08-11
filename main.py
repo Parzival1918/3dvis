@@ -13,9 +13,14 @@ initialCameraPosition = (0, 0, -20)
 #Read data from file
 atoms = parse_files.parse_XYZ("testFiles/pyridine.xyz")
 
+# UI text and buttons
+rotText = Text(text='Rotation: OFF', position=window.bottom_right, origin=(+0.5, -0.5))
+selectionTxt = Text(text='No atom selected', position=window.bottom_left, origin=(-0.5, -0.5))
+
 # Class entities
 class Atom(Entity):
     atomSelected = False
+    atomPosition = (0,0,0)
 
     def __init__(self, position=(0,0,0), scale=(1,1,1), **kwargs):
         super().__init__()
@@ -29,6 +34,7 @@ class Atom(Entity):
     def update(self):
         if self.hovered:
             self.color = color.tint(self.color, .1)
+            selectionTxt.text = f"{self.name}: {self.atomPosition}"
         else:
             self.color = color.orange
 
@@ -37,14 +43,12 @@ spheres = []
 for atom in atoms:
     sphere = Atom(position=(atom['x'], atom['y'], atom['z']))
     sphere.name = atom['element']
+    sphere.atomPosition = (atom['x'], atom['y'], atom['z'])
 
     spheres.append(sphere)
 
 # b = Button(text='hello world!', color=color.azure, scale=.25, highlight_scale=1.1)
 # b.tooltip = Tooltip('test')
-
-# UI text and buttons
-rotText = Text(text='Rotation: OFF', position=window.top_left)
 
 # DropdownMenu('File', buttons=(
 #     DropdownMenuButton('New'),
@@ -92,6 +96,9 @@ def update():
         camera.world_rotation_y -= held_keys['a'] * 1
         camera.world_rotation_x -= held_keys['w'] * 1
         camera.world_rotation_x += held_keys['s'] * 1
+
+    if mouse.hovered_entity == None:
+        selectionTxt.text = 'No atom selected'
 
 # start running the app
 app.run()
