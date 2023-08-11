@@ -11,21 +11,30 @@ app = Ursina(title="3Dvis", borderless=False, editor_ui_enabled=False, developme
 initialCameraPosition = (0, 0, -20)
 
 #Read data from file
-atoms = parse_files.parse_XYZ("testFiles/pyridine.xyz")
+atoms, uniqueSpecies = parse_files.parse_XYZ("testFiles/pyridine.xyz")
+selectionColours = [color.random_color() for _ in range(len(uniqueSpecies))]
+print(selectionColours)
 
 # UI text and buttons
 rotText = Text(text='Rotation: OFF', position=window.bottom_right, origin=(+0.5, -0.5))
 selectionTxt = Text(text='No atom selected', position=window.bottom_left, origin=(-0.5, -0.5))
+
+DropdownMenu('Settings', buttons=(
+    DropdownMenu('Atomic size', buttons=(
+        DropdownMenuButton('From file', on_click=lambda: print('From file')),
+        DropdownMenuButton('From table', on_click=lambda: print('From table')),
+    )),
+))
 
 # Class entities
 class Atom(Entity):
     atomSelected = False
     atomPosition = (0,0,0)
 
-    def __init__(self, position=(0,0,0), scale=(1,1,1), **kwargs):
+    def __init__(self, position=(0,0,0), scale=(1,1,1), color=color.orange, **kwargs):
         super().__init__()
         self.model = 'sphere'
-        self.color = color.orange
+        self.color = color
         self.scale = (1, 1, 1)
         self.collider = 'sphere'
         self.world_position = position
@@ -36,12 +45,12 @@ class Atom(Entity):
             self.color = color.tint(self.color, .1)
             selectionTxt.text = f"{self.name}: {self.atomPosition}"
         else:
-            self.color = color.orange
+            self.color = selectionColours[uniqueSpecies.index(self.name)]
 
 # create app contents
 spheres = []
 for atom in atoms:
-    sphere = Atom(position=(atom['x'], atom['y'], atom['z']))
+    sphere = Atom(position=(atom['x'], atom['y'], atom['z']), color=selectionColours[uniqueSpecies.index(atom['element'])])
     sphere.name = atom['element']
     sphere.atomPosition = (atom['x'], atom['y'], atom['z'])
 
@@ -49,21 +58,6 @@ for atom in atoms:
 
 # b = Button(text='hello world!', color=color.azure, scale=.25, highlight_scale=1.1)
 # b.tooltip = Tooltip('test')
-
-# DropdownMenu('File', buttons=(
-#     DropdownMenuButton('New'),
-#     DropdownMenuButton('Open'),
-#     DropdownMenu('Reopen Project', buttons=(
-#         DropdownMenuButton('Project 1'),
-#         DropdownMenuButton('Project 2'),
-#         )),
-#     DropdownMenuButton('Save'),
-#     DropdownMenu('Options', buttons=(
-#         DropdownMenuButton('Option a'),
-#         DropdownMenuButton('Option b'),
-#         )),
-#     DropdownMenuButton('Exit'),
-#     ))
 
 rotToggled = False
 def input(key):

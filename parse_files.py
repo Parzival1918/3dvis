@@ -13,6 +13,7 @@ def parse_XYZ(filename):
 
     #Read lines of file
     atoms = []
+    atomicSpecies = []
     for line in file:
         #Split line into list
         line = line.split()
@@ -29,6 +30,8 @@ def parse_XYZ(filename):
             "z": float(line[3])
         }
 
+        if atom['element'] not in atomicSpecies:
+            atomicSpecies.append(atom['element'])
         atoms.append(atom)
 
     #Close file
@@ -38,4 +41,4 @@ def parse_XYZ(filename):
         print("Error: Number of atoms does not match number of atoms in file")
         return
 
-    return atoms
+    return atoms, atomicSpecies
