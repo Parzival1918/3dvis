@@ -11,6 +11,9 @@ window.borderless = False # show a border
 # initialCameraPosition = camera.position
 initialCameraPosition = (0, 0, -20)
 
+#Read data from file
+atoms = parse_files.parse_XYZ("testFiles/pyridine.xyz")
+
 # Class entities
 class Atom(Entity):
     def __init__(self, position=(0,0,0), scale=(1,1,1), **kwargs):
@@ -30,8 +33,10 @@ class Atom(Entity):
 
 # create app contents
 spheres = []
-for i in range(0, 3):
-    sphere = Atom(position=(i, 0, 0))
+for atom in atoms:
+    sphere = Atom(position=(atom['x'], atom['y'], atom['z']))
+    sphere.name = atom['element']
+
     spheres.append(sphere)
 
 # b = Button(text='hello world!', color=color.azure, scale=.25, highlight_scale=1.1)
