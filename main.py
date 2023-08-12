@@ -77,23 +77,34 @@ def update():
         camera.position = initialCameraPosition
         camera.rotation = (0, 0, 0)
 
+    if held_keys['v']: # reset camera rotation
+        camera.rotation = (0, 0, 0)
+
     # camera movement   
-    camera.position += camera.forward * time.dt * 10 * held_keys['w']
-    camera.position -= camera.forward * time.dt * 10 * held_keys['s']
+    if rotToggled:
+        camera.position += camera.up * time.dt * 10 * held_keys['w']
+        camera.position -= camera.up * time.dt * 10 * held_keys['s']
+        camera.position += camera.forward * time.dt * 10 * held_keys['x']
+        camera.position -= camera.forward * time.dt * 10 * held_keys['z']
+    else: 
+        camera.position += camera.forward * time.dt * 10 * held_keys['w']
+        camera.position -= camera.forward * time.dt * 10 * held_keys['s']
     camera.position += camera.right * time.dt * 10 * held_keys['d']
     camera.position -= camera.right * time.dt * 10 * held_keys['a']
 
     # camera rotation
     if rotToggled:
-        camera.world_rotation_y += held_keys['d'] * 1
-        camera.world_rotation_y -= held_keys['a'] * 1
-        camera.world_rotation_x -= held_keys['w'] * 1
-        camera.world_rotation_x += held_keys['s'] * 1
+        # camera.world_rotation_y += held_keys['d'] * 1
+        # camera.world_rotation_y -= held_keys['a'] * 1
+        # camera.world_rotation_x -= held_keys['w'] * 1
+        # camera.world_rotation_x += held_keys['s'] * 1
+
+        camera.look_at(Vec3(0, 0, 0)) # Move around origin
 
     if mouse.hovered_entity == None:
         selectionTxt.text = 'No atom selected'
 
-    if mouse.left and mouse.moving:
+    if mouse.left and mouse.moving and not rotToggled:
         global prevMousePos
         if prevMousePos == None:
             prevMousePos = mouse.position
@@ -110,7 +121,6 @@ def update():
                     camera.world_rotation_x -= speed
                 else:
                     camera.world_rotation_x += speed
-        print(mouse.position)
 
 def atomic_size_from_table():
     print("Atomic size from table")
