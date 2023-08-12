@@ -15,6 +15,8 @@ app = Ursina(title="3Dvis", borderless=False, editor_ui_enabled=False, developme
 # initialCameraPosition = camera.position
 initialCameraPosition = (0, 0, -20)
 prevMousePos = None
+defaultColours = [color.red, color.blue, color.green, color.yellow, color.orange, color.magenta, color.cyan, color.lime, color.olive, color.gray, color.white, color.black]
+legendConts = []
 
 #Read data from file
 atoms, uniqueSpecies = parse_files.parse_XYZ("testFiles/pyridine.xyz")
@@ -126,7 +128,7 @@ def atomic_size_from_table():
     print("Atomic size from table")
 
     for sphere in spheres:
-        scale = atomicData.loc[atomicData["Symbol"] == sphere.name]["AtomicRadius"] / 100.0
+        scale = atomicData.loc[atomicData["Symbol"] == sphere.name]["AtomicRadius"] * 2 / 100.0
         sphere.scale = (scale, scale, scale)
 
 def atomic_size_equal():
@@ -141,7 +143,30 @@ def colour_random():
     global selectionColours
     selectionColours = [color.random_color() for _ in range(len(uniqueSpecies))]
     for sphere in spheres:
-        sphere.color = color.random_color()
+        sphere.color = selectionColours[uniqueSpecies.index(sphere.name)]
+
+    #Update legend colours
+    if len(legendConts) > 0:
+        for pos,cont in enumerate(legendConts):
+            cont.color = selectionColours[pos]
+
+def show_legend():
+    if len(legendConts) > 0:
+        print("Show legend")
+        for cont in legendConts:
+            cont.show()
+        return
+    else:
+        print("Generate and show legend")
+        for species in uniqueSpecies:
+            t = Text(text=species, position=window.top_right, origin=(+0.5, +0.5), color=selectionColours[uniqueSpecies.index(species)], y=0.5 - 0.05*uniqueSpecies.index(species))
+            legendConts.append(t)
+
+def hide_legend():
+    if len(legendConts) > 0:
+        print("Hide legend")
+        for cont in legendConts:
+            cont.hide()
 
 DropdownMenu('Settings', buttons=(
     DropdownMenu('Atomic size', buttons=(
@@ -151,7 +176,13 @@ DropdownMenu('Settings', buttons=(
     )),
     DropdownMenu('Colour', buttons=(
         DropdownMenuButton('Random', on_click=lambda: colour_random()),
-    ))
+    )),
+    # DropdownMenuButton('Reset camera position', on_click=lambda:, tooltip=Tooltip('Reset camera position')),
+    # DropdownMenuButton('Reset camera rotation', on_click=lambda:, tooltip=Tooltip('Reset camera rotation')),
+    DropdownMenu('Legend', buttons=(
+        DropdownMenuButton('Show', on_click=lambda: show_legend()),
+        DropdownMenuButton('Hide', on_click=lambda: hide_legend()),
+    )),
 ))
 
 atomic_size_from_table() # Set atomic size from table as default
