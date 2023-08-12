@@ -14,6 +14,7 @@ app = Ursina(title="3Dvis", borderless=False, editor_ui_enabled=False, developme
 # Set initial variables
 # initialCameraPosition = camera.position
 initialCameraPosition = (0, 0, -20)
+prevMousePos = None
 
 #Read data from file
 atoms, uniqueSpecies = parse_files.parse_XYZ("testFiles/pyridine.xyz")
@@ -91,6 +92,25 @@ def update():
 
     if mouse.hovered_entity == None:
         selectionTxt.text = 'No atom selected'
+
+    if mouse.left and mouse.moving:
+        global prevMousePos
+        if prevMousePos == None:
+            prevMousePos = mouse.position
+        else:
+            deltaMousePos = [mouse.position[0] - prevMousePos[0], mouse.position[1] - prevMousePos[1]]
+            speed = 0.5
+            if abs(deltaMousePos[0]) >= 0.02:
+                if deltaMousePos[0] > 0:
+                    camera.world_rotation_y += speed
+                else:
+                    camera.world_rotation_y -= speed
+            if abs(deltaMousePos[1]) >= 0.02:
+                if deltaMousePos[1] > 0:
+                    camera.world_rotation_x -= speed
+                else:
+                    camera.world_rotation_x += speed
+        print(mouse.position)
 
 def atomic_size_from_table():
     print("Atomic size from table")
