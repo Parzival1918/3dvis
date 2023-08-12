@@ -5,7 +5,9 @@ import pandas as pd
 import parse_files
 
 #Load the atomic data from the csv file PubChemElements_all.csv
-atomicData = pd.read_csv("dataFiles/PubChemElements_all.csv")
+FILE_PATH = Path(__file__).parent / "dataFiles"
+
+atomicData = pd.read_csv(FILE_PATH / "PubChemElements_all.csv")
 # print(atomicData.loc[atomicData["Symbol"] == "H"]["AtomicRadius"])
 
 # create a window
